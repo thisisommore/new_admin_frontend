@@ -1,78 +1,213 @@
-import { CounterData } from "@/program/accounts";
-import { increment, initialize } from "@/program/instructions";
+import { NFTStorage, File } from "nft.storage";
+import { createNews } from "@/program/out/instructions";
 import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
+import BN from "bn.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Transaction, SystemProgram, Keypair, PublicKey } from "@solana/web3.js";
+import {
+  Transaction,
+  SystemProgram,
+  Keypair,
+  PublicKey,
+} from "@solana/web3.js";
 import React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
-const Max = () => {
+interface NewsForm {
+  title: string;
+  category: string;
+  date: number;
+  description: string;
+  image: FileList;
+  keywords: string;
+  place: string;
+  videoLink: string;
+}
+
+const schema = yup.object().shape({
+  title: yup.string().required("Title is required"),
+  category: yup.string().required("Category is required"),
+  date: yup.number().required("Date is required"),
+  description: yup.string().required("Description is required"),
+  image: yup
+    .mixed<FileList>()
+    .required("Image is required")
+    .test(
+      "fileSize",
+      "File size should be less than or equal to 2MB",
+      (value: FileList | undefined | null) => {
+        if (!value || !value[0]) {
+          return false;
+        }
+        return value[0].size <= 2 * 1024 * 1024;
+      }
+    ),
+  keywords: yup.string().required("Keywords are required"),
+  place: yup.string().required("Place is required"),
+  videoLink: yup.string().required("Video Link is required"),
+});
+
+const Max: React.FC = () => {
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<NewsForm>({
+    resolver: yupResolver(schema),
+  });
 
-  const create_account = async () => {
-    console.log("wa");
+  const nftStorageApiKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEU3Q0M3QzQwYmVmN2UwYzJmNUJhMEUxNWFFMjFGRGUyNUYyNjViN0EiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY1OTgwMTY5MzAxMSwibmFtZSI6Ik1heCJ9.YUx1HpK4kAYdITAZ5BEKHJgcv1FUNW9Y4s0p4h0wCak";
+  const client = new NFTStorage({ token: nftStorageApiKey });
 
+  const create_news = async (data: NewsForm) => {
     if (!publicKey) throw new WalletNotConnectedError();
 
-    const transactions = new Transaction().add(
-      SystemProgram.transfer({
-        fromPubkey: publicKey,
-        toPubkey: Keypair.generate().publicKey,
-        lamports: 0,
-      })
+    // Upload the image to NFT Storage
+    const imageFile = data.image[0];
+    const cid_str = await client.storeBlob(
+      new File([imageFile], imageFile.name, { type: imageFile.type })
+    );
+    const imageHash = cid_str.toString();
+
+    const news_account = Keypair.generate();
+    const tx = new Transaction();
+    const create_news_tx = createNews(
+      {
+        category: data.category,
+        date: new BN(data.date),
+        description: data.description,
+        image: imageHash,
+        keywords: data.keywords.split(","),
+        place: data.place,
+        title: data.title,
+        videoLink: data.videoLink,
+      },
+      {
+        creator: publicKey,
+        news: news_account.publicKey,
+        systemProgram: SystemProgram.programId,
+      }
     );
 
-    const signature = await sendTransaction(transactions, connection);
+    tx.add(create_news_tx);
+    const signature = await sendTransaction(tx, connection, {
+      signers: [news_account],
+    });
+    console.log(signature);
+
     await connection.confirmTransaction(signature, "processed");
     console.log("dom");
   };
 
-
-  const initiate = async ()=>{
-    if (!publicKey) throw new WalletNotConnectedError();
-
-    const baseAccount = Keypair.generate()
-    const tx = new Transaction()
-    const tx1 = initialize({
-      baseAccount: baseAccount.publicKey,
-      user:publicKey,
-      systemProgram:SystemProgram.programId
-    })
-    console.log("backup this account",baseAccount.secretKey.toString());
-
-    tx.add(tx1)
-
-    const signature = await sendTransaction(tx, connection);
-    console.log(signature);
-
-    await connection.confirmTransaction(signature, "processed");
-    console.log("dom");
-  }
-  const increment_counter = async () => {
-    if (!publicKey) throw new WalletNotConnectedError();
-
-    // Fill base account secret here
-    const baseAccountSecret = [0,0,0,0]
-    const baseAccount = Keypair.fromSecretKey(Uint8Array.from(baseAccountSecret))
-    const tx = new Transaction()
-    console.log(await CounterData.fetch(connection, baseAccount.publicKey));
-    const tx1 = increment({
-      baseAccount: baseAccount.publicKey
-    })
-
-    tx.add(tx1)
-
-    const signature = await sendTransaction(tx, connection);
-    console.log(signature);
-
-    await connection.confirmTransaction(signature, "processed");
-    console.log("dom");
-    console.log(await CounterData.fetch(connection, baseAccount.publicKey));
-  }
+  const onSubmit: SubmitHandler<NewsForm> = (data) => {
+    create_news(data);
+  };
   return (
-    <div>
-      <button onClick={create_account}>Max</button>
-      <button onClick={increment_counter}>Incre</button>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="w-full max-w-md bg-white p-6 rounded-lg">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <input
+              {...register("title")}
+              className="w-full border border-gray-300 p-2 rounded-lg"
+              placeholder="Title"
+            />
+            {errors.title && (
+              <p className="text-red-500">{errors.title.message}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              {...register("category")}
+              className="w-full border border-gray-300 p-2 rounded-lg"
+              placeholder="Category"
+            />
+            {errors.category && (
+              <p className="text-red-500">{errors.category.message}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              {...register("date")}
+              type="number"
+              className="w-full border border-gray-300 p-2 rounded-lg"
+              placeholder="Date"
+            />
+            {errors.date && (
+              <p className="text-red-500">{errors.date.message}</p>
+            )}
+          </div>
+
+          <div>
+            <textarea
+              {...register("description")}
+              className="w-full border border-gray-300 p-2 rounded-lg"
+              placeholder="Description"
+            />
+            {errors.description && (
+              <p className="text-red-500">{errors.description.message}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              {...register("image")}
+              type="file"
+              accept="image/*"
+              className="w-full border border-gray-300 p-2 rounded-lg"
+            />
+            {errors.image && (
+              <p className="text-red-500">{errors.image.message}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              {...register("keywords")}
+              className="w-full border border-gray-300 p-2 rounded-lg"
+              placeholder="Keywords (comma separated)"
+            />
+            {errors.keywords && (
+              <p className="text-red-500">{errors.keywords.message}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              {...register("place")}
+              className="w-full border border-gray-300 p-2 rounded-lg"
+              placeholder="Place"
+            />
+            {errors.place && (
+              <p className="text-red-500">{errors.place.message}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              {...register("videoLink")}
+              className="w-full border border-gray-300 p-2 rounded-lg"
+              placeholder="Video Link"
+            />
+            {errors.videoLink && (
+              <p className="text-red-500">{errors.videoLink.message}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

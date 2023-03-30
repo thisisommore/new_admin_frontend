@@ -12,10 +12,13 @@ const SolanaWalletProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const network = WalletAdapterNetwork.Devnet;
+
   const endpoint = clusterApiUrl(network);
-  const wallets = [new PhantomWalletAdapter({
-    network
-  })];
+  const wallets = [
+    new PhantomWalletAdapter({
+      network,
+    }),
+  ];
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
