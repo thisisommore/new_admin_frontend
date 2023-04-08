@@ -25,7 +25,7 @@ const VIEWS_LEN = 8;
 const TITLE_LEN = 32;
 const DESCRIPTION_LEN = 64;
 const PLACE_LEN = 32;
-const IMAGE_LEN = 32;
+const IMAGE_LEN = 64;
 const CATEGORY_LEN = 32;
 const VIDEO_LINK_LEN = 64;
 const KEYWORDS_LEN = 8;
@@ -92,6 +92,9 @@ const Max: React.FC = () => {
     const year = dateObj.getFullYear();
     const news_account = Keypair.generate();
     const tx = new Transaction();
+
+    console.log("wawa", stringToBuffer(imageHash, IMAGE_LEN).toString());
+
     const create_news_tx = createNews(
       {
         category: stringToBuffer(data.category, CATEGORY_LEN),

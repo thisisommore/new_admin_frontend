@@ -25,46 +25,31 @@
         {
           "name": "title",
           "type": {
-            "array": [
-              "u8",
-              32
-            ]
+            "array": ["u8", 32]
           }
         },
         {
           "name": "description",
           "type": {
-            "array": [
-              "u8",
-              64
-            ]
+            "array": ["u8", 64]
           }
         },
         {
           "name": "place",
           "type": {
-            "array": [
-              "u8",
-              32
-            ]
+            "array": ["u8", 32]
           }
         },
         {
           "name": "image",
           "type": {
-            "array": [
-              "u8",
-              32
-            ]
+            "array": ["u8", 64]
           }
         },
         {
           "name": "category",
           "type": {
-            "array": [
-              "u8",
-              32
-            ]
+            "array": ["u8", 32]
           }
         },
         {
@@ -78,10 +63,7 @@
         {
           "name": "videoLink",
           "type": {
-            "array": [
-              "u8",
-              64
-            ]
+            "array": ["u8", 64]
           }
         },
         {
@@ -89,10 +71,7 @@
           "type": {
             "array": [
               {
-                "array": [
-                  "u8",
-                  8
-                ]
+                "array": ["u8", 8]
               },
               5
             ]
@@ -136,46 +115,31 @@
           {
             "name": "title",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "description",
             "type": {
-              "array": [
-                "u8",
-                64
-              ]
+              "array": ["u8", 64]
             }
           },
           {
             "name": "place",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
             "name": "image",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 64]
             }
           },
           {
             "name": "category",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -193,10 +157,7 @@
           {
             "name": "videoLink",
             "type": {
-              "array": [
-                "u8",
-                64
-              ]
+              "array": ["u8", 64]
             }
           },
           {
@@ -204,10 +165,7 @@
             "type": {
               "array": [
                 {
-                  "array": [
-                    "u8",
-                    8
-                  ]
+                  "array": ["u8", 8]
                 },
                 5
               ]

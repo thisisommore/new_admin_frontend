@@ -52,7 +52,7 @@ export class News {
     borsh.array(borsh.u8(), 32, "title"),
     borsh.array(borsh.u8(), 64, "description"),
     borsh.array(borsh.u8(), 32, "place"),
-    borsh.array(borsh.u8(), 32, "image"),
+    borsh.array(borsh.u8(), 64, "image"),
     borsh.array(borsh.u8(), 32, "category"),
     borsh.u64("views"),
     borsh.u8("month"),
