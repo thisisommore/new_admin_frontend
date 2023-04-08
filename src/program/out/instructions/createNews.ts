@@ -4,14 +4,15 @@ import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript
 import { PROGRAM_ID } from "../programId"
 
 export interface CreateNewsArgs {
-  title: string
-  description: string
-  place: string
-  image: string
-  category: string
-  date: BN
-  videoLink: string
-  keywords: Array<string>
+  title: Array<number>
+  description: Array<number>
+  place: Array<number>
+  image: Array<number>
+  category: Array<number>
+  month: number
+  year: number
+  videoLink: Array<number>
+  keywords: Array<Array<number>>
 }
 
 export interface CreateNewsAccounts {
@@ -21,14 +22,15 @@ export interface CreateNewsAccounts {
 }
 
 export const layout = borsh.struct([
-  borsh.str("title"),
-  borsh.str("description"),
-  borsh.str("place"),
-  borsh.str("image"),
-  borsh.str("category"),
-  borsh.i64("date"),
-  borsh.str("videoLink"),
-  borsh.vec(borsh.str(), "keywords"),
+  borsh.array(borsh.u8(), 32, "title"),
+  borsh.array(borsh.u8(), 64, "description"),
+  borsh.array(borsh.u8(), 32, "place"),
+  borsh.array(borsh.u8(), 32, "image"),
+  borsh.array(borsh.u8(), 32, "category"),
+  borsh.u8("month"),
+  borsh.u16("year"),
+  borsh.array(borsh.u8(), 64, "videoLink"),
+  borsh.array(borsh.array(borsh.u8(), 8), 5, "keywords"),
 ])
 
 export function createNews(args: CreateNewsArgs, accounts: CreateNewsAccounts) {
@@ -46,7 +48,8 @@ export function createNews(args: CreateNewsArgs, accounts: CreateNewsAccounts) {
       place: args.place,
       image: args.image,
       category: args.category,
-      date: args.date,
+      month: args.month,
+      year: args.year,
       videoLink: args.videoLink,
       keywords: args.keywords,
     },

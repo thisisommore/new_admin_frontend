@@ -4,41 +4,44 @@ import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript
 import { PROGRAM_ID } from "../programId"
 
 export interface NewsFields {
-  title: string
-  description: string
-  place: string
-  image: string
-  category: string
+  title: Array<number>
+  description: Array<number>
+  place: Array<number>
+  image: Array<number>
+  category: Array<number>
   views: BN
-  date: BN
-  videoLink: string
-  keywords: Array<string>
+  month: number
+  year: number
+  videoLink: Array<number>
+  keywords: Array<Array<number>>
   creator: PublicKey
 }
 
 export interface NewsJSON {
-  title: string
-  description: string
-  place: string
-  image: string
-  category: string
+  title: Array<number>
+  description: Array<number>
+  place: Array<number>
+  image: Array<number>
+  category: Array<number>
   views: string
-  date: string
-  videoLink: string
-  keywords: Array<string>
+  month: number
+  year: number
+  videoLink: Array<number>
+  keywords: Array<Array<number>>
   creator: string
 }
 
 export class News {
-  readonly title: string
-  readonly description: string
-  readonly place: string
-  readonly image: string
-  readonly category: string
+  readonly title: Array<number>
+  readonly description: Array<number>
+  readonly place: Array<number>
+  readonly image: Array<number>
+  readonly category: Array<number>
   readonly views: BN
-  readonly date: BN
-  readonly videoLink: string
-  readonly keywords: Array<string>
+  readonly month: number
+  readonly year: number
+  readonly videoLink: Array<number>
+  readonly keywords: Array<Array<number>>
   readonly creator: PublicKey
 
   static readonly discriminator = Buffer.from([
@@ -46,15 +49,16 @@ export class News {
   ])
 
   static readonly layout = borsh.struct([
-    borsh.str("title"),
-    borsh.str("description"),
-    borsh.str("place"),
-    borsh.str("image"),
-    borsh.str("category"),
+    borsh.array(borsh.u8(), 32, "title"),
+    borsh.array(borsh.u8(), 64, "description"),
+    borsh.array(borsh.u8(), 32, "place"),
+    borsh.array(borsh.u8(), 32, "image"),
+    borsh.array(borsh.u8(), 32, "category"),
     borsh.u64("views"),
-    borsh.i64("date"),
-    borsh.str("videoLink"),
-    borsh.vec(borsh.str(), "keywords"),
+    borsh.u8("month"),
+    borsh.u16("year"),
+    borsh.array(borsh.u8(), 64, "videoLink"),
+    borsh.array(borsh.array(borsh.u8(), 8), 5, "keywords"),
     borsh.publicKey("creator"),
   ])
 
@@ -65,7 +69,8 @@ export class News {
     this.image = fields.image
     this.category = fields.category
     this.views = fields.views
-    this.date = fields.date
+    this.month = fields.month
+    this.year = fields.year
     this.videoLink = fields.videoLink
     this.keywords = fields.keywords
     this.creator = fields.creator
@@ -116,7 +121,8 @@ export class News {
       image: dec.image,
       category: dec.category,
       views: dec.views,
-      date: dec.date,
+      month: dec.month,
+      year: dec.year,
       videoLink: dec.videoLink,
       keywords: dec.keywords,
       creator: dec.creator,
@@ -131,7 +137,8 @@ export class News {
       image: this.image,
       category: this.category,
       views: this.views.toString(),
-      date: this.date.toString(),
+      month: this.month,
+      year: this.year,
       videoLink: this.videoLink,
       keywords: this.keywords,
       creator: this.creator.toString(),
@@ -146,7 +153,8 @@ export class News {
       image: obj.image,
       category: obj.category,
       views: new BN(obj.views),
-      date: new BN(obj.date),
+      month: obj.month,
+      year: obj.year,
       videoLink: obj.videoLink,
       keywords: obj.keywords,
       creator: new PublicKey(obj.creator),

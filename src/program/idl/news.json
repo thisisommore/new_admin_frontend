@@ -24,36 +24,78 @@
       "args": [
         {
           "name": "title",
-          "type": "string"
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
           "name": "description",
-          "type": "string"
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
         },
         {
           "name": "place",
-          "type": "string"
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
           "name": "image",
-          "type": "string"
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
           "name": "category",
-          "type": "string"
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
-          "name": "date",
-          "type": "i64"
+          "name": "month",
+          "type": "u8"
+        },
+        {
+          "name": "year",
+          "type": "u16"
         },
         {
           "name": "videoLink",
-          "type": "string"
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
         },
         {
           "name": "keywords",
           "type": {
-            "vec": "string"
+            "array": [
+              {
+                "array": [
+                  "u8",
+                  8
+                ]
+              },
+              5
+            ]
           }
         }
       ]
@@ -93,40 +135,82 @@
         "fields": [
           {
             "name": "title",
-            "type": "string"
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "description",
-            "type": "string"
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
           },
           {
             "name": "place",
-            "type": "string"
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "image",
-            "type": "string"
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "category",
-            "type": "string"
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "views",
             "type": "u64"
           },
           {
-            "name": "date",
-            "type": "i64"
+            "name": "month",
+            "type": "u8"
+          },
+          {
+            "name": "year",
+            "type": "u16"
           },
           {
             "name": "videoLink",
-            "type": "string"
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
           },
           {
             "name": "keywords",
             "type": {
-              "vec": "string"
+              "array": [
+                {
+                  "array": [
+                    "u8",
+                    8
+                  ]
+                },
+                5
+              ]
             }
           },
           {
@@ -145,6 +229,6 @@
     }
   ],
   "metadata": {
-    "address": "3hJc8UD8dCKpuJiBzKwfeAmxBS2AmCCbUczKRL7x3QGV"
+    "address": "4qf7wofgoJz27cx3e8j5MqKqEdnMyCFtXexzPh16GCnt"
   }
 }

@@ -13,11 +13,26 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+function stringToBuffer(str: string, len: number) {
+  let buf = Buffer.alloc(len);
+  buf.write(str);
+  return Array.from(buf.slice(0, len));
+}
 
+const DISC = 8;
+const MONTH_LEN = 1;
+const VIEWS_LEN = 8;
+const TITLE_LEN = 32;
+const DESCRIPTION_LEN = 64;
+const PLACE_LEN = 32;
+const IMAGE_LEN = 32;
+const CATEGORY_LEN = 32;
+const VIDEO_LINK_LEN = 64;
+const KEYWORDS_LEN = 8;
 interface NewsForm {
   title: string;
   category: string;
-  date: number;
+  date: string;
   description: string;
   image: FileList;
   keywords: string;
@@ -28,7 +43,7 @@ interface NewsForm {
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
   category: yup.string().required("Category is required"),
-  date: yup.number().required("Date is required"),
+  date: yup.date().required("Date is required"),
   description: yup.string().required("Description is required"),
   image: yup
     .mixed<FileList>()
@@ -72,19 +87,24 @@ const Max: React.FC = () => {
       new File([imageFile], imageFile.name, { type: imageFile.type })
     );
     const imageHash = cid_str.toString();
-
+    const dateObj = new Date(data.date);
+    const month = dateObj.getMonth();
+    const year = dateObj.getFullYear();
     const news_account = Keypair.generate();
     const tx = new Transaction();
     const create_news_tx = createNews(
       {
-        category: data.category,
-        date: new BN(data.date),
-        description: data.description,
-        image: imageHash,
-        keywords: data.keywords.split(","),
-        place: data.place,
-        title: data.title,
-        videoLink: data.videoLink,
+        category: stringToBuffer(data.category, CATEGORY_LEN),
+        month: new Date().getMonth(),
+        year: new Date().getFullYear(),
+        description: stringToBuffer(data.description, DESCRIPTION_LEN),
+        image: stringToBuffer(imageHash, IMAGE_LEN),
+        keywords: data.keywords
+          .split(",")
+          .map((e) => stringToBuffer(e, KEYWORDS_LEN)),
+        place: stringToBuffer(data.place, PLACE_LEN),
+        title: stringToBuffer(data.title, TITLE_LEN),
+        videoLink: stringToBuffer(data.videoLink, VIDEO_LINK_LEN),
       },
       {
         creator: publicKey,
@@ -135,7 +155,7 @@ const Max: React.FC = () => {
           <div>
             <input
               {...register("date")}
-              type="number"
+              type="date"
               className="w-full border border-gray-300 p-2 rounded-lg"
               placeholder="Date"
             />
